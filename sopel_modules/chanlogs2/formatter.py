@@ -9,15 +9,15 @@ from sopel.logger import get_logger
 
 LOGGER = get_logger(__name__)
 
-PRIVMSG_TMPL = '{datetime} <{nick}> {message}'
-ACTION_TMPL = '{datetime} * {nick} {message}'
-NOTICE_TMPL = '{datetime} -{nick}- {message}'
-NICK_TMPL = '{datetime} *** {nick} is now known as {sender}'
-JOIN_TMPL = '{datetime} *** Joins: {nick} ({ident}@{host})'
-PART_TMPL = '{datetime} *** Parts: {nick} ({ident}@{host}) ({message})'
-QUIT_TMPL = '{datetime} *** Quits: {nick} ({ident}@{host}) ({message})'
-KICK_TMPL = '{datetime} *** {nick} was kicked by {sender} ({message})'
-MODE_TMPL = '{datetime} *** {nick} sets mode: {args_str}'
+PRIVMSG_TMPL = '[{time}] <{nick}> {message}'
+ACTION_TMPL = '[{time}] * {nick} {message}'
+NOTICE_TMPL = '[{time}] -{nick}- {message}'
+NICK_TMPL = '[{time}] *** {nick} is now known as {sender}'
+JOIN_TMPL = '[{time}] *** Joins: {nick} ({ident}@{host})'
+PART_TMPL = '[{time}] *** Parts: {nick} ({ident}@{host}) ({message})'
+QUIT_TMPL = '[{time}] *** Quits: {nick} ({ident}@{host}) ({message})'
+KICK_TMPL = '[{time}] *** {nick} was kicked by {sender} ({message})'
+MODE_TMPL = '[{time}] *** {nick} sets mode: {args_str}'
 
 
 def preformat(bot, trigger, channel):
