@@ -18,9 +18,11 @@ PART_TMPL = '[{time}] *** Parts: {nick} ({ident}@{host}) ({message})'
 QUIT_TMPL = '[{time}] *** Quits: {nick} ({ident}@{host}) ({message})'
 KICK_TMPL = '[{time}] *** {nick} was kicked by {sender} ({message})'
 MODE_TMPL = '[{time}] *** {nick} sets mode: {args_str}'
+TOPIC_TMPL = '[{time}] *** {nick} changes topic to \'{message}\''
 
 
 def preformat(bot, trigger, channel):
+    now = datetime.datetime.utcnow().replace(microsecond=0)
     event = {
         'channel':  channel,
         'type':     trigger.event,
@@ -29,9 +31,9 @@ def preformat(bot, trigger, channel):
         'ident':    trigger.user,
         'host':     trigger.host,
         'sender':   trigger.sender,
-        'datetime': datetime.datetime.utcnow().isoformat(),
-        'date':     datetime.datetime.utcnow().date().isoformat(),
-        'time':     datetime.datetime.utcnow().time().isoformat(),
+        'datetime': now.isoformat(),
+        'date':     now.date().isoformat(),
+        'time':     now.time().isoformat(),
         'args':     trigger.args,
         'args_str': ' '.join(trigger.args[1:]),
         'tags':     trigger.tags,

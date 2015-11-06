@@ -31,6 +31,7 @@ class Chanlogs2Section(StaticSection):
     quit_template = ValidatedAttribute('quit_template', default=None)
     nick_template = ValidatedAttribute('nick_template', default=None)
     mode_template = ValidatedAttribute('mode_template', default=None)
+    topic_template = ValidatedAttribute('topic_template', default=None)
 
 
 def configure(config):
@@ -104,6 +105,13 @@ def redirect_quit(bot, trigger):
 @module.event('MODE')
 @module.unblockable
 def redirect_mode(bot, trigger):
+    process_event(bot, trigger)
+
+
+@module.rule('.*')
+@module.event('TOPIC')
+@module.unblockable
+def redirect_topic(bot, trigger):
     process_event(bot, trigger)
 
 
