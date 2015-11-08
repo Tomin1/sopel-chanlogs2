@@ -9,16 +9,16 @@ import threading
 
 from sopel import module
 from sopel.tools import Identifier, SopelMemoryWithDefault
-from sopel.config.types import StaticSection, ValidatedAttribute
+from sopel.config.types import StaticSection, ValidatedAttribute, FilenameAttribute
 
-from chanlogs2 import formatter
+from sopel_modules.chanlogs2 import formatter
 
 
 BAD_CHARS = re.compile(r'[\/?%*:|"<>. ]')
 
 
 class Chanlogs2Section(StaticSection):
-    logdir = ValidatedAttribute('logdir', default='~/chanlogs')
+    logdir = FilenameAttribute('logdir', directory=True, default='~/chanlogs')
     by_day = ValidatedAttribute('by_day', parse=bool, default=True)
     privmsg = ValidatedAttribute('privmsg', parse=bool, default=False)
 
@@ -41,11 +41,6 @@ def configure(config):
 
 def setup(bot):
     bot.config.define_section('chanlogs2', Chanlogs2Section)
-
-    basedir = os.path.expanduser(bot.config.chanlogs2.logdir)
-    if not os.path.exists(basedir):
-        os.makedirs(basedir)
-    bot.config.chanlogs2.logdir = basedir
 
     # locks for log files
     if not bot.memory.contains('chanlog2_locks'):
