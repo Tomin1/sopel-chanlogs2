@@ -16,13 +16,15 @@ NICK_TMPL = '[{time}] *** {nick} is now known as {sender}'
 JOIN_TMPL = '[{time}] *** Joins: {nick} ({ident}@{host})'
 PART_TMPL = '[{time}] *** Parts: {nick} ({ident}@{host}) ({message})'
 QUIT_TMPL = '[{time}] *** Quits: {nick} ({ident}@{host}) ({message})'
-KICK_TMPL = '[{time}] *** {nick} was kicked by {sender} ({message})'
+KICK_TMPL = '[{time}] *** {args[1]} was kicked by {nick} ({message})'
 MODE_TMPL = '[{time}] *** {nick} sets mode: {args_str}'
 TOPIC_TMPL = '[{time}] *** {nick} changes topic to \'{message}\''
 
 
 def preformat(bot, trigger, channel):
     now = datetime.datetime.utcnow().replace(microsecond=0)
+    if hasattr(trigger, 'time'):
+        now = trigger.time.replace(microsecond=0)
     event = {
         'channel':  channel,
         'type':     trigger.event,
