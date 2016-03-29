@@ -194,7 +194,7 @@ def write_log_line(bot, event, channel):
 
     if bot.config.chanlogs2.by_day:
         filename = "{channel}-{date}.log".format(channel=channel, 
-            date=event['datetime'])
+            date=event['date'])
     else:
         filename = "{channel}.log".format(channel=channel)
     logfile = os.path.join(bot.config.chanlogs2.logdir, filename)
