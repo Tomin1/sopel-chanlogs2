@@ -186,7 +186,8 @@ def get_conn(bot):
 def write_db_line(bot, event, channel):
     connection = get_conn(bot)
 
-    return if not connection
+    if not connection:
+        return
 
     with closing(connection) as conn:
         cursor = conn.cursor()
