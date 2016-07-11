@@ -55,7 +55,11 @@ def setup(bot):
     bot.config.define_section('chanlogs2', Chanlogs2Section)
 
     if bot.config.chanlogs2.backend == 'postgres':
-        with closing(get_conn(bot)) as conn:
+        connection = get_conn(bot)
+
+        raise ValueError('Unable to connect with given postgres connection string') if not connection
+
+        with closing(connection) as conn:
             cursor = conn.cursor()
             cursor.execute('CREATE TABLE IF NOT EXISTS chanlogs('
                 'id        serial primary key,'
@@ -175,7 +179,11 @@ def get_conn(bot):
 
 
 def write_db_line(bot, event, channel):
-    with closing(get_conn(bot)) as conn:
+    connection = get_conn(bot)
+
+    return if not connection
+
+    with closing(connection) as conn:
         cursor = conn.cursor()
         cursor.execute('INSERT INTO chanlogs '
             '(network, channel, type, message, nick, ident, host, sender, timestamp, args, tags, intent)'
