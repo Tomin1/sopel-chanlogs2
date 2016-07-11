@@ -57,7 +57,8 @@ def setup(bot):
     if bot.config.chanlogs2.backend == 'postgres':
         connection = get_conn(bot)
 
-        raise ValueError('Unable to connect with given postgres connection string') if not connection
+        if not connection:
+            raise ValueError('Unable to connect with given postgres connection string')
 
         with closing(connection) as conn:
             cursor = conn.cursor()
