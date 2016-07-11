@@ -174,8 +174,12 @@ def write_log(bot, event, channel):
 
 
 def get_conn(bot):
-    connection = psycopg2.connect(bot.config.chanlogs2.pg_connection)
-    return connection
+    try:
+        connection = psycopg2.connect(bot.config.chanlogs2.pg_connection)
+        return connection
+    except psycopg2.Error as e:
+        print(e.pgerror)
+        return False
 
 
 def write_db_line(bot, event, channel):
