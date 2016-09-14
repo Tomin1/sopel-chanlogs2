@@ -3,6 +3,7 @@
 from __future__ import unicode_literals, absolute_import, division, print_function
 
 import datetime
+import pytz
 
 from sopel.logger import get_logger
 
@@ -22,9 +23,20 @@ TOPIC_TMPL = '[{time}] *** {nick} changes topic to \'{message}\''
 
 
 def preformat(bot, trigger, channel):
-    now = datetime.datetime.utcnow().replace(microsecond=0)
+    # Get default timezone from the config
+    timezone = get_timezone(bot.db, bot.config)
+    if not timezone:
+        timezone = 'UTC'
+    tz = pytz.timezone(timezone)
+
+    # Set default now value, then try to pull from trigger (sopel 6.3+)
+    now = datetime.now(tz)
     if hasattr(trigger, 'time'):
-        now = trigger.time.replace(microsecond=0)
+        now = trigger.time.replace(tzinfo=pytz.utc).astimezone(tz)
+
+    # Strip off microseconds so more things understand the ISO format
+    now = now.replace(microsecond=0)
+
     event = {
         'channel':  channel,
         'type':     trigger.event,
