@@ -6,6 +6,7 @@ import datetime
 import pytz
 
 from sopel.logger import get_logger
+from sopel.tools.time import get_timezone
 
 
 LOGGER = get_logger(__name__)
@@ -30,7 +31,7 @@ def preformat(bot, trigger, channel):
     tz = pytz.timezone(timezone)
 
     # Set default now value, then try to pull from trigger (sopel 6.3+)
-    now = datetime.now(tz)
+    now = datetime.datetime.now(tz)
     if hasattr(trigger, 'time'):
         now = trigger.time.replace(tzinfo=pytz.utc).astimezone(tz)
 
