@@ -153,7 +153,7 @@ def redirect_topic(bot, trigger):
     process_event(bot, trigger)
 
 
-@require_chanmsg('.logging_start is only permitted in channels')
+@require_chanmsg('.logging is only permitted in channels')
 @require_owner("Sorry, I can't do that for you")
 @module.commands("logging")
 @example('.logging (start|stop)')
