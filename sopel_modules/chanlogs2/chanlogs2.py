@@ -2,7 +2,6 @@
 
 from __future__ import unicode_literals, absolute_import, division, print_function
 
-import datetime
 import re
 import os
 import threading
@@ -14,7 +13,9 @@ from sopel.config.types import StaticSection, ValidatedAttribute, FilenameAttrib
 import psycopg2
 from psycopg2.extras import Json
 
+
 from chanlogs2 import formatter
+
 
 BAD_CHARS = re.compile(r'[\/?%*:|"<>. ]')
 
@@ -28,6 +29,7 @@ class Chanlogs2Section(StaticSection):
     # The following config options are only valid if the backend is 'file'
     logdir = FilenameAttribute('logdir', directory=True, default='~/chanlogs')
     by_day = ValidatedAttribute('by_day', parse=bool, default=True)
+    allow_toggle = ValidatedAttribute('allow_toggle', parse=bool, default=False)
 
     privmsg_template = ValidatedAttribute('privmsg_template', default=None)
     action_template = ValidatedAttribute('action_template', default=None)
@@ -44,6 +46,7 @@ class Chanlogs2Section(StaticSection):
 def configure(config):
     config.define_section('chanlogs2', Chanlogs2Section, validate=False)
     config.chanlogs2.configure_setting('backend', 'Log storage backend (file or postgres)')
+    config.chanlogs2.configure_setting('allow_toggle', "Start and stop logging on an admin's command")
 
     if config.chanlogs2.backend == 'postgres':
         config.chanlogs2.configure_setting('pg_connection', 'PostgreSQL connection string, see http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING for more info')
@@ -149,6 +152,24 @@ def redirect_topic(bot, trigger):
     process_event(bot, trigger)
 
 
+@module.require_chanmsg('.log is only permitted in channels')
+@module.require_admin("Sorry, I can't do that for you")
+@module.commands("log")
+@module.example('.log start')
+def logging_command(bot, trigger):
+    if not bot.config.chanlogs2.allow_toggle:
+        bot.reply("I'm already logging everything.")
+        return
+    if trigger.group(2) == 'start':
+        bot.db.set_channel_value(trigger.sender, 'logging', True)
+        bot.reply('Logging started for this channel')
+    elif trigger.group(2) == 'stop':
+        bot.db.set_channel_value(trigger.sender, 'logging', False)
+        bot.reply('Logging stopped for this channel')
+    else:
+        bot.reply("Please, use '.log start' or '.log stop'")
+
+
 def process_event(bot, trigger):
     if trigger.event.upper() in ['QUIT', 'NICK']:
         privcopy = list(bot.privileges.items())
@@ -162,11 +183,15 @@ def process_event(bot, trigger):
 
 
 def write_log(bot, event, channel):
+    if bot.config.chanlogs2.allow_toggle:
+        if not bot.db.get_channel_value(channel, 'logging'):
+            return
+
     if not isinstance(channel, Identifier):
         channel = Identifier(channel)
 
     if channel.is_nick() and not bot.config.chanlogs2.privmsg:
-        return # Don't log if we are configured not to log PMs
+        return  # Don't log if we are configured not to log PMs
 
     if bot.config.chanlogs2.backend == 'postgres':
         write_db_line(bot, event, channel)
