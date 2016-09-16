@@ -46,12 +46,12 @@ class Chanlogs2Section(StaticSection):
 def configure(config):
     config.define_section('chanlogs2', Chanlogs2Section, validate=False)
     config.chanlogs2.configure_setting('backend', 'Log storage backend (file or postgres)')
+    config.chanlogs2.configure_setting('allow_toggle', "Start and stop logging on an admin's command")
 
     if config.chanlogs2.backend == 'postgres':
         config.chanlogs2.configure_setting('pg_connection', 'PostgreSQL connection string, see http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING for more info')
     else:
         config.chanlogs2.configure_setting('logdir', 'Log storage directory')
-        config.chanlogs2.configure_setting('allow_toggle', "Start and stop logging on an admin's command")
 
 
 def setup(bot):
@@ -157,17 +157,17 @@ def redirect_topic(bot, trigger):
 @module.commands("log")
 @module.example('.log start')
 def logging_command(bot, trigger):
-    if bot.config.chanlogs2.allow_toggle:
-        if trigger.group(2) == 'start':
-            bot.db.set_channel_value(trigger.sender, 'logging', True)
-            bot.reply('Logging started for this channel')
-        elif trigger.group(2) == 'stop':
-            bot.db.set_channel_value(trigger.sender, 'logging', False)
-            bot.reply('Logging stopped for this channel')
-        else:
-            bot.reply("Please, use '.log start' or '.log stop'")
-    else:
+    if not bot.config.chanlogs2.allow_toggle:
         bot.reply("I'm already logging everything.")
+        return
+    if trigger.group(2) == 'start':
+        bot.db.set_channel_value(trigger.sender, 'logging', True)
+        bot.reply('Logging started for this channel')
+    elif trigger.group(2) == 'stop':
+        bot.db.set_channel_value(trigger.sender, 'logging', False)
+        bot.reply('Logging stopped for this channel')
+    else:
+        bot.reply("Please, use '.log start' or '.log stop'")
 
 
 def process_event(bot, trigger):
