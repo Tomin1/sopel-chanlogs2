@@ -4,6 +4,15 @@ Sopel-Chanlogs2
 Quick rewrite of the old sopel chanlogs module to fix some bugs and
 clean up the code.
 
+Commands
+~~~~~~~~
+
+Logging is enabled for all channels by default, but you may want to
+disable logging on a per-channel basis.
+::
+    .log stop - stops logging in current channel
+    .log start - resumes logging in current channel
+
 Configuration
 ~~~~~~~~~~~~
 
