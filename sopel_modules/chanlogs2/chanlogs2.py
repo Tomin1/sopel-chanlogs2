@@ -10,8 +10,6 @@ from contextlib import closing
 from sopel import module
 from sopel.tools import Identifier, SopelMemoryWithDefault
 from sopel.config.types import StaticSection, ValidatedAttribute, FilenameAttribute
-import psycopg2
-from psycopg2.extras import Json
 
 
 from chanlogs2 import formatter
@@ -199,7 +197,8 @@ def write_log(bot, event, channel):
         write_log_line(bot, event, channel)
 
 
-def get_conn(bot):
+def get_conn(bot): 
+    import psycopg2
     try:
         connection = psycopg2.connect(bot.config.chanlogs2.pg_connection)
         return connection
@@ -209,6 +208,7 @@ def get_conn(bot):
 
 
 def write_db_line(bot, event, channel):
+    from psycopg2.extras import Json
     connection = get_conn(bot)
 
     if not connection:
